@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fy.record.mapper.AppointmentRecordMapper">
+    <resultMap id="BaseResultMap" type="com.fy.record.entity.AppointmentRecord">
+        <id column="ID" jdbcType="VARCHAR" property="id"/>
+        <result column="NAME" jdbcType="VARCHAR" property="name"/>
+        <result column="WX_USER_ID" jdbcType="VARCHAR" property="wxUserId"/>
+        <result column="DEP_ID" jdbcType="VARCHAR" property="depId"/>
+        <result column="DEP_NAME" jdbcType="VARCHAR" property="depName"/>
+        <result column="PHONE" jdbcType="VARCHAR" property="phone"/>
+        <result column="STATION_ID" jdbcType="VARCHAR" property="stationId"/>
+        <result column="APPOINTMENT_TIME" jdbcType="DATE" property="appointmentTime"/>
+        <result column="BEGIN_TIME" jdbcType="DATE" property="beginTime"/>
+        <result column="END_TIME" jdbcType="DATE" property="endTime"/>
+        <result column="STATUS" jdbcType="VARCHAR" property="status"/>
+        <result column="INSERTER" jdbcType="VARCHAR" property="inserter"/>
+        <result column="INSERT_TIME" jdbcType="DATE" property="insertTime"/>
+        <result column="UPDATEER" jdbcType="VARCHAR" property="updateer"/>
+        <result column="UPDATE_TIME" jdbcType="DATE" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+		ID,NAME,WX_USER_ID,DEP_ID,DEP_NAME,PHONE,STATION_ID,APPOINTMENT_TIME,BEGIN_TIME,END_TIME,STATUS,INSERT_TIME,UPDATEER,UPDATE_TIME
+	</sql>
+
+    <!-- 添加 -->
+    <insert id="insert"  useGeneratedKeys="true" keyProperty="id" parameterType="com.fy.record.entity.AppointmentRecord">
+        <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.String">
+            SELECT APPOINTMENT_RECORD_SEQ.NEXTVAL AS id FROM DUAL
+        </selectKey>
+        insert into APPOINTMENT_RECORD
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">ID,</if>
+            <if test="name != null">NAME,</if>
+            <if test="wxUserId != null">WX_USER_ID,</if>
+            <if test="depId != null">DEP_ID,</if>
+            <if test="depName != null">DEP_NAME,</if>
+            <if test="phone != null">PHONE,</if>
+            <if test="stationId != null">STATION_ID,</if>
+            <if test="appointmentTime != null">APPOINTMENT_TIME,</if>
+            <if test="beginTime != null">BEGIN_TIME,</if>
+            <if test="endTime != null">END_TIME,</if>
+            <if test="status != null">STATUS,</if>
+            <if test="inserter != null">INSERTER,</if>
+            <if test="insertTime != null">INSERT_TIME,</if>
+            <if test="updateer != null">UPDATEER,</if>
+            <if test="updateTime != null">UPDATE_TIME,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null">#{name,jdbcType=VARCHAR},</if>
+            <if test="wxUserId != null">#{wxUserId,jdbcType=VARCHAR},</if>
+            <if test="depId != null">#{depId,jdbcType=VARCHAR},</if>
+            <if test="depName != null">#{depName,jdbcType=VARCHAR},</if>
+            <if test="phone != null">#{phone,jdbcType=VARCHAR},</if>
+            <if test="stationId != null">#{stationId,jdbcType=VARCHAR},</if>
+            <if test="appointmentTime != null">#{appointmentTime,jdbcType=DATE},</if>
+            <if test="beginTime != null">#{beginTime,jdbcType=DATE},</if>
+            <if test="endTime != null">#{endTime,jdbcType=DATE},</if>
+            <if test="status != null">#{status,jdbcType=VARCHAR},</if>
+            <if test="inserter != null">#{inserter,jdbcType=VARCHAR},</if>
+            <if test="insertTime != null">#{insertTime,jdbcType=DATE},</if>
+            <if test="updateer != null">#{updateer,jdbcType=VARCHAR},</if>
+            <if test="updateTime != null">#{updateTime,jdbcType=DATE},</if>
+        </trim>
+    </insert>
+
+    <!-- 删除 -->
+    <delete id="delete" parameterType="java.lang.String">
+		delete from APPOINTMENT_RECORD where ID = #{id}
+	</delete>
+
+    <!-- 批量删除 -->
+    <delete id="deleteByIds" parameterType="java.lang.String">
+        delete from APPOINTMENT_RECORD where ID in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 修改 -->
+    <update id="update" parameterType="com.fy.record.entity.AppointmentRecord">
+        update APPOINTMENT_RECORD
+        <set>
+            <if test="id != null">ID = #{id,jdbcType=VARCHAR},</if>
+            <if test="name != null">NAME = #{name,jdbcType=VARCHAR},</if>
+            <if test="wxUserId != null">WX_USER_ID = #{wxUserId,jdbcType=VARCHAR},</if>
+            <if test="depId != null">DEP_ID = #{depId,jdbcType=VARCHAR},</if>
+            <if test="depName != null">DEP_NAME = #{depName,jdbcType=VARCHAR},</if>
+            <if test="phone != null">PHONE = #{phone,jdbcType=VARCHAR},</if>
+            <if test="stationId != null">STATION_ID = #{stationId,jdbcType=VARCHAR},</if>
+            <if test="appointmentTime != null">APPOINTMENT_TIME = #{appointmentTime,jdbcType=DATE},</if>
+            <if test="beginTime != null">BEGIN_TIME = #{beginTime,jdbcType=DATE},</if>
+            <if test="endTime != null">END_TIME = #{endTime,jdbcType=DATE},</if>
+            <if test="status != null">STATUS = #{status,jdbcType=VARCHAR},</if>
+            <if test="inserter != null">INSERTER = #{inserter,jdbcType=VARCHAR},</if>
+            <if test="insertTime != null">INSERT_TIME = #{insertTime,jdbcType=DATE},</if>
+            <if test="updateer != null">UPDATER = #{updateer,jdbcType=VARCHAR},</if>
+            <if test="updateTime != null">UPDATE_TIME = #{updateTime,jdbcType=DATE},</if>
+        </set>
+        where ID = #{id}
+    </update>
+
+    <!-- 根据ID查询 -->
+    <select id="selectById" resultType="java.util.Map">
+		select
+		ID,NAME,WX_USER_ID,DEP_ID,DEP_NAME,PHONE,STATION_ID,APPOINTMENT_TIME,BEGIN_TIME,END_TIME,STATUS,INSERT_TIME,UPDATEER,UPDATE_TIME
+		from APPOINTMENT_RECORD
+		where ID = #{id}
+	</select>
+
+    <!-- 根据ID查询 -->
+    <select id="selectEntityById" resultMap="BaseResultMap">
+		select
+		ID,NAME,WX_USER_ID,DEP_ID,DEP_NAME,PHONE,STATION_ID,APPOINTMENT_TIME,BEGIN_TIME,END_TIME,STATUS,INSERT_TIME,UPDATEER,UPDATE_TIME
+		from APPOINTMENT_RECORD
+		where ID = #{id}
+	</select>
+
+    <!-- 查询所有 -->
+    <select id="selectAll" resultType="java.util.Map">
+		select ID,NAME,WX_USER_ID,DEP_ID,DEP_NAME,PHONE,STATION_ID,APPOINTMENT_TIME,BEGIN_TIME,END_TIME,STATUS,INSERT_TIME,UPDATEER,UPDATE_TIME from APPOINTMENT_RECORD
+	</select>
+
+    <!-- 查询该岗位所有的预约记录 -->
+    <select id="selectByStationId" resultType="java.util.Map">
+        select ri.STATION_ID, to_char(ri.APPO_DATE,'yyyy-mm-dd') APPO_DATE,ri.TIME_FRAME,ri.counts,s.NUM,s.NAME
+        from (select STATION_ID,APPO_DATE,TIME_FRAME,count(*) counts
+              from RECORD_INFO
+              where APPO_DATE >= sysdate and STATION_ID =  #{stationId}
+              group by STATION_ID,APPO_DATE,TIME_FRAME) ri
+                 left join STATION s on ri.STATION_ID = s.ID
+	</select>
+
+    <!-- 分页查询 -->
+    <select id="selectList" resultType="java.util.Map">
+		select ar.*,s.NAME stationName from APPOINTMENT_RECORD ar left join STATION s on ar.STATION_ID = s.ID where 1 = 1
+		<if test="stationName != null and stationName != ''"> and s.NAME like CONCAT(CONCAT('%', #{stationName}),'%') </if>
+		<if test="appointmentName != null and appointmentName != ''"> and ar.NAME like CONCAT(CONCAT('%', #{appointmentName}),'%') </if>
+		<if test="appointmentTime != null and appointmentTime != ''"> and  to_char(ar.APPOINTMENT_TIME,'yyyy-mm-dd') = #{appointmentTime} </if>
+		<if test="beginTime != null and beginTime != ''"> and ar.BEGIN_TIME &gt;= #{beginTime} </if>
+		<if test="endTime != null and endTime != ''"> and ar.END_TIME &lt;= #{endTime} </if>
+		<if test="depId != null and depId != ''"> and ar.DEP_ID = #{depId} </if>
+		<if test="depIds != null and depIds != ''"> and ar.DEP_ID = #{depId} </if>
+		<if test="depName != null and depName != ''"> and ar.DEP_NAME = #{depName} </if>
+		<if test="phone != null and phone != ''"> and ar.PHONE = #{phone} </if>
+		<if test="status != null and status != ''"> and ar.STATUS = #{status} </if>
+        order by ar.APPOINTMENT_TIME desc
+	</select>
+
+    <!-- 查询该日期的时间段 -->
+    <select id="selectRecordInfoNum" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(*) counts from (
+          select APPO_ID
+            from RECORD_INFO
+            where 1 = 1
+            <if test="stationId != null and stationId != ''">  and STATION_ID = #{stationId} </if>
+            <if test="date != null and date != ''">  and  to_char(APPO_DATE,'yyyy-mm-dd') = #{date} </if>
+            <if test="begin != null and begin != ''">  and TIME_FRAME  &gt;= #{begin} </if>
+            <if test="end != null and end != ''">  and TIME_FRAME &lt;= #{end} </if>
+            <if test="appoId != null and appoId != ''">  and APPO_ID != #{appoId} </if>
+            <if test="phone != null and phone != ''">  and PHONE = #{phone} </if>
+            group by APPO_ID
+        ) ri
+	</select>
+
+    <!-- 查询该日期的人员姓名 -->
+    <select id="selectName" resultType="java.lang.String" >
+        select wmsys.wm_concat(to_char(ar.NAME))
+        from RECORD_INFO ri
+                 left join APPOINTMENT_RECORD ar on ri.APPO_ID = ar.ID
+        where ri.STATION_ID = #{arg0}
+          and TIME_FRAME = #{arg2}
+          and APPO_DATE = to_date(#{arg1},'yyyy-MM-dd')
+    </select>
+
+    <!-- 获取排行榜 -->
+    <select id="selectRankingList" resultType="java.util.Map" parameterType="java.lang.String">
+        select ri.PHONE,ri.INSERTER,count(*) sumTime
+        from (select * from RECORD_INFO where to_char(APPO_DATE, 'yyyy-MM') = #{month}) ri
+        group by ri.PHONE, INSERTER
+        order by sumTime desc
+    </select>
+
+</mapper>

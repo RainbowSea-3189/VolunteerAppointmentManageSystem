@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fy.station.mapper.StationMapper">
+    <resultMap id="BaseResultMap" type="com.fy.station.entity.Station">
+        <id column="ID" jdbcType="VARCHAR" property="id" />
+        <result column="NAME" jdbcType="VARCHAR" property="name" />
+        <result column="DETAILS" jdbcType="VARCHAR" property="details" />
+        <result column="NUM" jdbcType="DOUBLE" property="num" />
+        <result column="SORT" jdbcType="DOUBLE" property="sort" />
+        <result column="INSERTER" jdbcType="VARCHAR" property="inserter" />
+        <result column="INSERT_TIME" jdbcType="DATE" property="insertTime" />
+        <result column="UPDATEER" jdbcType="VARCHAR" property="updateer" />
+        <result column="UPDATE_TIME" jdbcType="DATE" property="updateTime" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        ID,NAME,DETAILS,NUM,SORT,INSERTER,INSERT_TIME,UPDATEER,UPDATE_TIME
+	</sql>
+
+    <!-- 添加 -->
+    <insert id="insert" parameterType="com.fy.station.entity.Station" useGeneratedKeys="true" keyProperty="id">
+        insert into station
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null"> ID, </if>
+            <if test="name != null"> NAME, </if>
+            <if test="details != null"> DETAILS, </if>
+            <if test="num != null"> NUM, </if>
+            <if test="sort != null"> SORT, </if>
+            <if test="inserter != null"> INSERTER, </if>
+            <if test="insertTime != null"> INSERT_TIME, </if>
+            <if test="updateer != null"> UPDATEER, </if>
+            <if test="updateTime != null"> UPDATE_TIME, </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null"> #{id,jdbcType=DOUBLE}, </if>
+            <if test="name != null"> #{name,jdbcType=VARCHAR}, </if>
+            <if test="details != null"> #{details,jdbcType=VARCHAR}, </if>
+            <if test="num != null"> #{num,jdbcType=DOUBLE}, </if>
+            <if test="sort != null"> #{sort,jdbcType=DOUBLE}, </if>
+            <if test="inserter != null"> #{inserter,jdbcType=VARCHAR}, </if>
+            <if test="insertTime != null"> #{insertTime,jdbcType=DATE}, </if>
+            <if test="updateer != null"> #{updateer,jdbcType=VARCHAR}, </if>
+            <if test="updateTime != null">  #{updateTime,jdbcType=DATE}, </if>
+        </trim>
+    </insert>
+
+    <!-- 删除 -->
+    <delete id="delete" parameterType="java.lang.Integer">
+		delete from STATION where ID = #{id}
+	</delete>
+
+    <!-- 批量删除 -->
+    <delete id="deleteByIds" parameterType="java.lang.Integer">
+        delete from STATION where ID in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 修改 -->
+    <update id="update" parameterType="com.fy.station.entity.Station">
+        update STATION
+        <set>
+            <if test="id != null"> ID = #{id,jdbcType=DOUBLE}, </if>
+            <if test="name != null"> NAME = #{name,jdbcType=VARCHAR}, </if>
+            <if test="details != null"> DETAILS = #{details,jdbcType=VARCHAR}, </if>
+            <if test="num != null"> NUM = #{num,jdbcType=DOUBLE}, </if>
+            <if test="sort != null"> SORT = #{sort,jdbcType=DOUBLE}, </if>
+            <if test="inserter != null"> INSERTER = #{inserter,jdbcType=VARCHAR}, </if>
+            <if test="insertTime != null"> INSERT_TIME = #{insertTime,jdbcType=DATE}, </if>
+            <if test="updateer != null"> UPDATEER = #{updateer,jdbcType=VARCHAR}, </if>
+            <if test="updateTime != null"> UPDATE_TIME = #{updateTime,jdbcType=DATE}, </if>
+        </set>
+        where ID = #{id,jdbcType=DOUBLE}
+    </update>
+
+    <!-- 根据ID查询 -->
+    <select id="selectById" resultType="java.util.Map">
+		select
+            ID,NAME,DETAILS,NUM,SORT,INSERTER,INSERT_TIME,UPDATEER,UPDATE_TIME
+		from STATION
+		where ID = #{id}
+	</select>
+
+    <!-- 根据ID查询 -->
+    <select id="selectEntityById" resultMap="BaseResultMap">
+		select
+            ID,NAME,DETAILS,NUM,SORT,INSERTER,INSERT_TIME,UPDATEER,UPDATE_TIME
+		from STATION
+		where ID = #{id}
+	</select>
+
+    <!-- 查询所有 -->
+    <select id="selectAll" resultType="java.util.Map">
+		select ID,NAME,DETAILS,NUM,SORT,INSERTER,INSERT_TIME,UPDATEER,UPDATE_TIME from STATION where  1 = 1
+        <if test="name != null and name != ''"> and NAME like CONCAT('%',#{stationName},'%') </if>
+        order by INSERT_TIME asc
+	</select>
+
+    <!-- 分页查询 -->
+    <select id="selectList" resultType="java.util.Map">
+		select ID,NAME,DETAILS,NUM,SORT,INSERTER,INSERT_TIME,UPDATEER,UPDATE_TIME from STATION where 1 = 1
+		<if test="name != null and name != ''"> and NAME like CONCAT('%',#{stationName},'%') </if>
+	</select>
+
+    <!-- 查询该岗位ID有多少条记录 -->
+    <select id="selectRecordByStationId" resultType="java.lang.Integer">
+		select count(*) counts from APPOINTMENT_RECORD where STATION_ID = #{stationId} and end_time > sysdate
+	</select>
+
+    <!-- 查询该时段空闲 -->
+    <select id="selectStationByTime" resultType="java.util.Map">
+        select *
+        from STATION
+        where ID not in(
+            select STATION_ID
+            from RECORD_INFO ri
+            where APPO_DATE = #{arg0}
+            and TIME_FRAME &gt;= #{arg1}
+            and TIME_FRAME &lt;= #{arg2}
+            group by STATION_ID)
+    </select>
+</mapper>
