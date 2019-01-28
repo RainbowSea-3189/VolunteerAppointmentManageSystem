@@ -389,7 +389,7 @@
             ],
             dayClick: function(date, allDay, jsEvent, view) {//点击时间触发事件
                 data = new Date(date);
-                if (new Date(dateFmt('yyyy-MM-dd', data)) <= new Date(dateFmt('yyyy-MM-dd', new Date()))) {
+                if (new Date(dateFmt('yyyy-MM-dd HH:mm:ss', data)) < new Date(dateFmt('yyyy-MM-dd HH:mm:ss', new Date()))) {
                     return 0;
                 }
                 if (data.getHours() == 12 || data.getHours() == 13) {

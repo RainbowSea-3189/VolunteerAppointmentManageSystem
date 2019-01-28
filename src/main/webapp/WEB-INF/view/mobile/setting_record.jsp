@@ -48,9 +48,7 @@
                 </div>
                 <div class="panel-body">
                     <p>岗位名称：${list.STATIONNAME}</p>
-                    <%--<c:if test="${userPhone == '13576748986' or userPhone == '13479902100' or userDepId == '494'}">--%>
-                        <p>预约日期：<fmt:formatDate value="${list.APPOINTMENT_TIME}" pattern="yyyy年MM月dd日"/></p>
-                    <%--</c:if>--%>
+                    <p>预约日期：<fmt:formatDate value="${list.APPOINTMENT_TIME}" pattern="yyyy年MM月dd日"/></p>
                     <p>志愿服务从<fmt:formatDate value="${list.BEGIN_TIME}" pattern=" a HH点"/>至<fmt:formatDate value="${list.END_TIME}" pattern=" a HH点"/></p>
                 </div>
                 <div class="panel-footer" style="text-align: right">
@@ -64,9 +62,7 @@
                         <c:if test="${list.STATUS == 2}">
                             <button type="button" class="btn btn-default" appoId="${list.ID}" status="${list.STATUS}">已完成</button>
                         </c:if>
-                        <%--<c:if test="${userPhone == '13576748986' or userPhone == '13479902100' or userDepId == '494'}">--%>
                             <button type="button" class="btn btn-danger delete" appoId="${list.ID}" status="${list.STATUS}">删除</button>
-                        <%--</c:if>--%>
                     </div>
                 </div>
             </div>

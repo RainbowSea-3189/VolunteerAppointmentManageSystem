@@ -6,7 +6,7 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <html>
 <head>
     <title>志愿者预约系统</title>
@@ -39,13 +39,13 @@
             <div class="panel-footer" style="text-align: right">
                 <div style="display: inline;">
                     <c:if test="${list.STATUS == 0}">
-                        <button type="button" class="btn btn-default" appoId="${list.ID}" status="${list.STATUS}">签到</button>
+                        <button type="button" class="btn btn-default" appoId="${list.ID}" status="${list.STATUS}">状态：待签到</button>
                     </c:if>
                     <c:if test="${list.STATUS == 1}">
-                        <button type="button" class="btn btn-default" appoId="${list.ID}" status="${list.STATUS}">完成</button>
+                        <button type="button" class="btn btn-default" appoId="${list.ID}" status="${list.STATUS}">状态：已签到</button>
                     </c:if>
                     <c:if test="${list.STATUS == 2}">
-                        <button type="button" class="btn btn-default" appoId="${list.ID}" status="${list.STATUS}">已完成</button>
+                        <button type="button" class="btn btn-default" appoId="${list.ID}" status="${list.STATUS}">状态：已完成</button>
                     </c:if>
                     <c:if test="${list.STATUS == 0 }">
                         <button type="button" class="btn btn-danger delete" appoId="${list.ID}" status="${list.STATUS}">删除</button>

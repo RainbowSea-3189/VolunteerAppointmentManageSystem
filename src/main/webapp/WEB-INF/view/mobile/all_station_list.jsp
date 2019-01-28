@@ -40,7 +40,7 @@
     <div style="text-align: center">
         <button type="button" id="ranking" class="btn btn-link">排行榜</button>
         <button type="button" id="record" class="btn btn-link">我的预约记录和服务时长</button>
-        <c:if test="${userPhone == '13576748986' or userPhone == '13479902100' or userPhone == '13970741276' or userDepId == '494'}">
+        <c:if test="${userPhone == '13576748986' or userPhone == '13479902100' or userPhone == '13970741276' or userPhone == '13576734954' or userDepId == '494'}">
             <button type="button" id="setting" class="btn btn-link">管理</button>
         </c:if>
     </div>
@@ -71,12 +71,18 @@
 
     //管理
     $("#setting").on("click", function () {
-        <%--var phone = '${userPhone}';--%>
-        <%--if (phone == '18370850492') {--%>
-            <%--$(location).attr('href', '${basePath}/mobile/settingRecord?appointmentTime=&depId=');--%>
-        <%--} else {--%>
-            $(location).attr('href', '${basePath}/mobile/settingRecord?appointmentTime=' + dateFmt('yyyy-MM-dd', new Date()));
-        // }
+        var phone = '${userPhone}';
+        var sign = '';
+        if (phone == '13576748986') {//黄清云--管理门诊
+            sign = '门诊';
+        } else if (phone == '13479902100') {//彭辉--管理住院服务中心
+            sign = '住院服务中心';
+        } else if (phone == '13970741276') {//宋志美--管理医保咨询
+            sign = '医保咨询';
+        } else if (phone == '13576734954') {//林秀--管理所有
+            sign = '';
+        }
+        $(location).attr('href', '${basePath}/mobile/settingRecord?stationName=' + sign + '&appointmentTime=' + dateFmt('yyyy-MM-dd', new Date()));
     });
 </script>
 </body>
