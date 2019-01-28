@@ -27,7 +27,7 @@
                 <input type="text" placeholder="预约人电话" value="${map.phone}" class="form-control" style="display: inline;width: 48%" id="phone">
             </div>
             <div class="form-group" style="margin:5px">
-                <input type="text" placeholder="岗位名称" value="${map.stationName}" class="form-control" style="display: inline;width: 48%" id="stationName">&nbsp;&nbsp;
+                <input type="text" placeholder="岗位名称" value="${map.stationName}" class="form-control" style="display: inline;width: 48%" id="stationName" <c:if test="${userPhone == '13576748986' or userPhone == '13479902100' or userPhone == '13970741276'}"> disabled</c:if> >&nbsp;&nbsp;
                 <input type="text" placeholder="预约日期" value="${map.appointmentTime}" class="form-control" style="display: inline;width: 48%" id="date" readonly onclick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd'})">
             </div>
             <div class="form-group">

@@ -79,7 +79,7 @@
             sign = '住院服务中心';
         } else if (phone == '13970741276') {//宋志美--管理医保咨询
             sign = '医保咨询';
-        } else if (phone == '13576734954') {//林秀--管理所有
+        } else if (phone == '13576734954' || '${userDepId}' == '494') {//林秀和信息科--管理所有
             sign = '';
         }
         $(location).attr('href', '${basePath}/mobile/settingRecord?stationName=' + sign + '&appointmentTime=' + dateFmt('yyyy-MM-dd', new Date()));

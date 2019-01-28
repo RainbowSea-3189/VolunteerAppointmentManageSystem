@@ -48,7 +48,7 @@
                         <button type="button" class="btn btn-default" appoId="${list.ID}" status="${list.STATUS}">状态：已完成</button>
                     </c:if>
                     <c:if test="${list.STATUS == 0 }">
-                        <button type="button" class="btn btn-danger delete" appoId="${list.ID}" status="${list.STATUS}">删除</button>
+                        <button type="button" class="btn btn-danger delete" appoId="${list.ID}" appoDate="${list.INSERT_TIME}" status="${list.STATUS}">删除</button>
                     </c:if>
                 </div>
             </div>
@@ -187,10 +187,19 @@
 
 
     //删除弹窗
+    var sign = '0';
     $(".delete").on("click", function () {
         var id = $(this).attr("appoid");
-        $("#deleteId").val(id);
-        $("#deleteBtn").trigger("click");
+        var date = new Date($(this).attr("appodate"));
+        var nextdate = new Date(date.getTime() + 24*60*60*1000);
+        if (nextdate > new Date()) {
+            $("#msgInfo").text("预约记录在24小时内不能删除！");
+            $("#msgBtn").trigger("click");
+            sign = '1';
+        } else {
+            $("#deleteId").val(id);
+            $("#deleteBtn").trigger("click");
+        }
     });
 
     //删除记录
@@ -222,7 +231,10 @@
     //关闭信息提示框
     $("#msgOkBtn").on("click", function () {
         $("#msgModal").modal("hide");
-        window.location.reload();
+        if (sign == '0') {
+            window.location.reload();
+        }
+        sign = '1';
     });
 </script>
 </body>
