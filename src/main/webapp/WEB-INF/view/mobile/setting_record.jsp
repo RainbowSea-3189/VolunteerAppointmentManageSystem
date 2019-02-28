@@ -55,6 +55,8 @@
                     <div style="display: inline;">
                         <c:if test="${list.STATUS == 0}">
                             <button type="button" class="btn btn-warning submit" appoId="${list.ID}" status="${list.STATUS}">签到</button>
+                            <button type="button" class="btn btn-danger delete" appoId="${list.ID}" status="${list.STATUS}">删除</button>
+                    </div>
                         </c:if>
                         <c:if test="${list.STATUS == 1}">
                             <button type="button" class="btn btn-success submit" appoId="${list.ID}" status="${list.STATUS}">完成</button>
@@ -62,7 +64,6 @@
                         <c:if test="${list.STATUS == 2}">
                             <button type="button" class="btn btn-default" appoId="${list.ID}" status="${list.STATUS}">已完成</button>
                         </c:if>
-                            <button type="button" class="btn btn-danger delete" appoId="${list.ID}" status="${list.STATUS}">删除</button>
                     </div>
                 </div>
             </div>
@@ -125,6 +126,9 @@
     </div>
 <script>
 
+
+    var redicect = '0';
+
     $(function () {
         var width = $(window).width();
         $("body").attr("style", "width:" + width + "px");
@@ -167,8 +171,14 @@
                     $("#msgInfo").text(rb.msg);
                     $("#msgBtn").trigger("click");
                 } else {
-                    $("#msgInfo").text(rb.msg);
-                    $("#msgBtn").trigger("click");
+                    if (rb.msg == 'redirect') {
+                        $("#msgInfo").text("抱歉，您的身份验证已过期，请重新验证！");
+                        redicect = '1';
+                        $("#msgBtn").trigger("click");
+                    } else {
+                        $("#msgInfo").text(rb.msg);
+                        $("#msgBtn").trigger("click");
+                    }
                 }
             },
             error: function () {
@@ -214,7 +224,11 @@
     //关闭信息提示框
     $("#msgOkBtn").on("click", function () {
         $("#msgModal").modal("hide");
-        window.location.reload();
+        if (redicect == '1') {
+            $(location).attr('href', 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxc4b817ab27010402&redirect_uri=http%3a%2f%2fwww.gyyfy.com%3a9075%2fVAMS%2fmobile%2fallStation&response_type=code&scope=snsapi_base&state=#wechat_redirect');
+        } else {
+            window.location.reload();
+        }
     });
 </script>
 </body>

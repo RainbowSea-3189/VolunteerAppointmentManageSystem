@@ -185,7 +185,7 @@
     var userPhone = '';
     var userDepName = '';
     var userDepId = '';
-
+    var redicect = '0';
     $(document).ready(function() {
         show(new Date());
 
@@ -264,6 +264,7 @@
             var endTime = new Date($("#endTime").val().toString().replace(/-/g, "/"));
             var begin = new Date($("#beginTime").val().toString().replace(/-/g, "/")).getHours();
             var end = new Date($("#endTime").val().toString().replace(/-/g, "/")).getHours();
+            var sumTime =  end - begin;
             $.ajax({
                 type: "POST",
                 url: "${basePath}record/insert",
@@ -278,20 +279,30 @@
                     date: dateInsert,
                     beginTime: beginTime,
                     endTime:  endTime,
+                    sumTime:  sumTime,
                     begin: begin,
                     end: end
                 },// 要提交的表单
                 success: function (rb) {
                     if (rb.code == 0) {
                         $("#msgInfo").text(rb.msg);
+                        redicect = '1';
                         $("#msgBtn").trigger("click");
                     } else {
-                        $("#msgInfo").text(rb.msg);
-                        $("#msgBtn").trigger("click");
+                        if (rb.msg == 'redirect') {
+                            $("#msgInfo").text("抱歉，您的身份验证已过期，请重新验证！");
+                            redicect = '1';
+                            $("#msgBtn").trigger("click");
+                        } else {
+                            $("#msgInfo").text(rb.msg);
+                            redicect = '1';
+                            $("#msgBtn").trigger("click");
+                        }
                     }
                 },
                 error: function () {
                     $("#msgInfo").text("提交失败！");
+                    redicect = '1';
                     $("#msgBtn").trigger("click");
                 }
             });
@@ -348,7 +359,11 @@
     //关闭信息提示框
     $("#msgOkBtn").on("click", function () {
         $("#msgModal").modal("hide");
-        window.location.reload();
+        if (redicect == '1') {
+            $(location).attr('href', 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxc4b817ab27010402&redirect_uri=http%3a%2f%2fwww.gyyfy.com%3a9075%2fVAMS%2fmobile%2fallStation&response_type=code&scope=snsapi_base&state=#wechat_redirect');
+        } else {
+            window.location.reload();
+        }
     });
 
     //设置日历和日程

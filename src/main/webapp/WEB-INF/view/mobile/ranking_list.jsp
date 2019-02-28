@@ -19,10 +19,10 @@
     <div class="col-lg-12 col-sm-12" style="text-align: center">
         <h2 class="page-header">志愿服务排行榜</h2>
     </div>
-    <div style="text-align: center">
-        <input type="text" class="form-control" id="month" style="width: 120px;display: inline"
-               onclick="WdatePicker({el:this,dateFmt:'yyyy年MM月份',Mchanged:monthFunc})" readonly>
-    </div>
+    <%--<div style="text-align: center">--%>
+        <%--<input type="text" class="form-control" id="month" style="width: 120px;display: inline"--%>
+               <%--onclick="WdatePicker({el:this,dateFmt:'yyyy年MM月份',Mchanged:monthFunc})" readonly>--%>
+    <%--</div>--%>
     <div class="panel-body">
         <div class="table-responsive">
             <table class="table">
@@ -44,7 +44,7 @@
                     </c:otherwise>
                     </c:choose> >
                         <td>${status.count}</td>
-                        <td>${rankingList.INSERTER}</td>
+                        <td>${rankingList.NAME}</td>
                         <td>${rankingList.SUMTIME}</td>
                     </tr>
                 </c:forEach>
@@ -65,10 +65,10 @@
     });
 
 
-    function monthFunc(){
-        var month = $dp.cal.newdate.y.toString() + '-' + $dp.cal.newdate.M;
-        $(location).attr('href', '${basePath}/mobile/getRankingList?month=' + dateFmt('yyyy-MM', new Date(month)) );
-    }
+    <%--function monthFunc(){--%>
+        <%--var month = $dp.cal.newdate.y.toString() + '-' + $dp.cal.newdate.M;--%>
+        <%--$(location).attr('href', '${basePath}/mobile/getRankingList?month=' + dateFmt('yyyy-MM', new Date(month)) );--%>
+    <%--}--%>
 </script>
 </body>
 </html>

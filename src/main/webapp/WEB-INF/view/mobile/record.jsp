@@ -20,10 +20,11 @@
 <body>
 <div class="col-sm-12" style="display: inline-flex">
     <%--<span id="sumTime" style="font-size: 18px"></span>--%>
-    <div><h4 id="sumTime" style="font-size: 18px;margin: 10px;"></h4></div>
-    <button type="button" id="minus" class="btn btn-info btn-sm" data-toggle="modal" data-target="#showMonthModel">
-        <i class="fa fa-eye fa-btn"></i>
-    </button>
+    <div><h4 id="sumTime" style="font-size: 16px;margin: 10px;"></h4></div>
+    <%--<button type="button" id="minus" class="btn btn-info btn-sm">--%>
+        <%--<i class="fa fa-eye fa-btn"></i>--%>
+    <%--</button>--%>
+    <button type="button" class="btn btn-link"  data-toggle="modal" data-target="#showMonthModel">各月详情</button>
 </div>
 <!-- /.col-lg-12 -->
 <c:forEach items="${recordList}" var="list">
@@ -34,24 +35,35 @@
             </div>
             <div class="panel-body">
                 <p>预约时间：<fmt:formatDate value="${list.APPOINTMENT_TIME}" pattern="yyyy年MM月dd号"/></p>
-                <p>志愿服务从<fmt:formatDate value="${list.BEGIN_TIME}" pattern="dd号 a HH点"/>至<fmt:formatDate value="${list.END_TIME}" pattern="dd号 a HH点"/></p>
+                <p>志愿服务从<fmt:formatDate value="${list.BEGIN_TIME}" pattern="dd号 HH点"/>至<fmt:formatDate value="${list.END_TIME}" pattern="dd号 HH点"/></p>
+                <c:if test="${list.STATUS == 0}">
+                    <button type="button" class="btn btn-default" disabled>状态：待签到</button>
+                </c:if>
+                <c:if test="${list.STATUS == 1}">
+                    <button type="button" class="btn btn-default" disabled>状态：已签到</button>
+                </c:if>
+                <c:if test="${list.STATUS == 2}">
+                    <button type="button" class="btn btn-default" disabled>状态：已完成</button>
+                </c:if>
             </div>
-            <div class="panel-footer" style="text-align: right">
-                <div style="display: inline;">
-                    <c:if test="${list.STATUS == 0}">
-                        <button type="button" class="btn btn-default" appoId="${list.ID}" status="${list.STATUS}">状态：待签到</button>
-                    </c:if>
-                    <c:if test="${list.STATUS == 1}">
-                        <button type="button" class="btn btn-default" appoId="${list.ID}" status="${list.STATUS}">状态：已签到</button>
-                    </c:if>
-                    <c:if test="${list.STATUS == 2}">
-                        <button type="button" class="btn btn-default" appoId="${list.ID}" status="${list.STATUS}">状态：已完成</button>
-                    </c:if>
-                    <c:if test="${list.STATUS == 0 }">
-                        <button type="button" class="btn btn-danger delete" appoId="${list.ID}" appoDate="${list.INSERT_TIME}" status="${list.STATUS}">删除</button>
-                    </c:if>
+            <div class="panel-footer" style="text-align: center">
+                <div class="panel-body" style="padding: 0px 0px 15px 0px;width: 100%">
+                    <div class="col-sm-4" style="display:inline;position: absolute;left: 10px">
+                        <c:if test="${list.STATUS == 2}">
+                            <button type="button" class="btn btn-success success opinion" appoId="${list.ID}" appoDate="${list.INSERT_TIME}" status="${list.STATUS}">建议意见</button>
+                        </c:if>
+                    </div>
+                        <%--<div class="col-sm-4" style="display: inline;margin-bottom: 15px">共需${list.NUM}人</div>--%>
+                    <div class="col-sm-4" style="display: inline;"></div>
+                    <div class="col-sm-4" style="display: inline;position: absolute;right: 10px">
+                        <c:if test="${list.STATUS == 0}">
+                            <button type="button" class="btn btn-danger delete" appoId="${list.ID}" appoDate="${list.INSERT_TIME}" status="${list.STATUS}">删除</button>
+                        </c:if>
+
+                    </div>
                 </div>
             </div>
+
         </div>
         <!-- /.col-lg-4 -->
     </div>
@@ -155,29 +167,31 @@
     <c:forEach items="${recordList}" var="list" varStatus="status">
         time = dateFmt('yyyy-MM', new Date('${list.APPOINTMENT_TIME}'));
         preMonth = dateFmt('yyyy-MM',new Date(getPreMonth(dateFmt('yyyy-MM-dd', new Date()))));
-        if (time == preMonth) {
-            sumTime++;
+        if (${list.STATUS == 2}) {
+            sumTime += ${list.SUM_TIME};
         }
         if (${status.count == 1} ) {
-            signTime =time;
+            signTime = time;
         }
-        if (time != nowMonth) {
+        // if (time != nowMonth) {
             if (signTime != '' && signTime == time) {
-                sumMonthTime++;
+                if (${list.STATUS == 2}) {
+                    sumMonthTime += ${list.SUM_TIME};
+                }
             } else {
                 htmls += '<tr class="success">' +
                     '<td>'+signTime+'</td>' +
                     '<td>'+sumMonthTime+'</td>' +
                     '</tr>';
                 signTime = time;
-                sumMonthTime = 1;
+                sumMonthTime = ${list.SUM_TIME};
             }
-        }
+        // }
     </c:forEach>
 
     //页面加载完成事件
     $(function () {
-        $("#sumTime").text('您上个月的志愿服务时长为：' + sumTime + '小时');
+        $("#sumTime").text('您的志愿服务总时长为：' + sumTime + '小时');
         htmls += '<tr class="success">' +
             '<td>'+signTime+'</td>' +
             '<td>'+sumMonthTime+'</td>' +
@@ -215,9 +229,17 @@
                 if (rb.code == 0) {
                     $("#msgInfo").text(rb.msg);
                     $("#msgBtn").trigger("click");
+
+
                 } else {
-                    $("#msgInfo").text(rb.msg);
-                    $("#msgBtn").trigger("click");
+                    if (rb.msg == 'redirect') {
+                        $("#msgInfo").text("抱歉，您的身份验证已过期，请重新验证！");
+                        redicect = '1';
+                        $("#msgBtn").trigger("click");
+                    } else {
+                        $("#msgInfo").text(rb.msg);
+                        $("#msgBtn").trigger("click");
+                    }
                 }
             },
             error: function () {
@@ -228,11 +250,20 @@
         $("#deleteModal").modal("hide");
     });
 
+    //提交建议意见
+    $(".opinion").on("click", function () {
+        var id = $(this).attr("appoid");
+        window.location.href = "${basePath}mobile/opinion?appoID=" + id;
+    });
+
     //关闭信息提示框
     $("#msgOkBtn").on("click", function () {
         $("#msgModal").modal("hide");
         if (sign == '0') {
             window.location.reload();
+        }
+        if (redicect == '1') {
+            $(location).attr('href', 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxc4b817ab27010402&redirect_uri=http%3a%2f%2fwww.gyyfy.com%3a9075%2fVAMS%2fmobile%2fallStation&response_type=code&scope=snsapi_base&state=#wechat_redirect');
         }
         sign = '1';
     });

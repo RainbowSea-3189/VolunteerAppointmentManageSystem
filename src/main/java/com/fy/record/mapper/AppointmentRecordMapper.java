@@ -104,10 +104,16 @@ public interface AppointmentRecordMapper {
     String selectName(String stationId, String date, Integer timeFrame);
 
     /**
-     * 获取排行榜
+     * 获取排行榜按月份
      * @param month 月份
      * @return List<Map>
      */
     List<Map> selectRankingList(@Param("month")String month);
+
+    /**
+     * 获取排行榜
+     * @return List<Map>
+     */
+    List<Map> selectRankingListAll();
 
 }

@@ -69,41 +69,62 @@ public class AppointmentRecordController {
     @PostMapping("record/insert")
     @ResponseBody
         public ReturnBean insert(AppointmentRecord appointmentRecord, String date, Integer begin, Integer end) {
-        Map map = new HashMap();
-        map.put("date",date);
-        map.put("begin", begin + 1);
-        map.put("end", end);
-        map.put("stationId", appointmentRecord.getStationId());
-        //该志愿者该时段的人数
-        Integer num = appointmentRecordService.selectRecordInfoNum(map);
-        map.put("phone", appointmentRecord.getPhone());
-        //该志愿者该时段该用户的记录数量
-        Integer numSelf = appointmentRecordService.selectRecordInfoNum(map);
-        //获取该志愿者对象
-        Station station = stationService.selectEntityById(appointmentRecord.getStationId());
-        if (num < station.getNum()) {//判断是否超过设定的人数
-            if (numSelf == 0) {//判断用户自己是否已经预约
-                appointmentRecord.setAppointmentTime(DateUtil.stringToDate("yyyy-MM-dd", date));
-                appointmentRecord.setInserter(appointmentRecord.getName());
-                appointmentRecord.setInsertTime(new Date());
-                //插入预约记录主表
-                appointmentRecordService.insert(appointmentRecord);
-                RecordInfo recordInfo = new RecordInfo();
-                recordInfo.setPhone(appointmentRecord.getPhone());
-                recordInfo.setAppoId(appointmentRecord.getId());
-                recordInfo.setStationId(appointmentRecord.getStationId());
-                recordInfo.setAppoDate(appointmentRecord.getAppointmentTime());
-                recordInfo.setInserter(appointmentRecord.getName());
-                recordInfo.setInsertTime(new Date());
-                //插入预约记录详情表
-                recordInfoService.insert(recordInfo, begin, end);
-                return ReturnBean.ok();
+        if (request.getSession().getAttribute("userPhone") != null && !"".equals(request.getSession().getAttribute("userPhone"))) {
+            Map map = new HashMap();
+            map.put("date", date);
+            map.put("begin", begin + 1);
+            map.put("end", end);
+            map.put("stationId", appointmentRecord.getStationId());
+            //该志愿者该时段的人数
+            Integer num = appointmentRecordService.selectRecordInfoNum(map);
+            map.put("phone", appointmentRecord.getPhone());
+            //该志愿者该时段该用户的记录数量
+            Integer numSelf = appointmentRecordService.selectRecordInfoNum(map);
+            //获取该志愿者对象
+            Station station = stationService.selectEntityById(appointmentRecord.getStationId());
+            if (num < station.getNum()) {//判断是否超过设定的人数
+                if (numSelf == 0) {//判断用户自己是否已经预约
+                    appointmentRecord.setAppointmentTime(DateUtil.stringToDate("yyyy-MM-dd", date));
+                    appointmentRecord.setInserter(appointmentRecord.getName());
+                    appointmentRecord.setInsertTime(new Date());
+                    //插入预约记录主表
+                    appointmentRecordService.insert(appointmentRecord);
+                    RecordInfo recordInfo = new RecordInfo();
+                    recordInfo.setPhone(appointmentRecord.getPhone());
+                    recordInfo.setAppoId(appointmentRecord.getId());
+                    recordInfo.setStationId(appointmentRecord.getStationId());
+                    recordInfo.setAppoDate(appointmentRecord.getAppointmentTime());
+                    recordInfo.setInserter(appointmentRecord.getName());
+                    recordInfo.setInsertTime(new Date());
+                    //插入预约记录详情表
+                    recordInfoService.insert(recordInfo, begin, end);
+                    return ReturnBean.ok();
+                } else {
+                    return ReturnBean.error("抱歉，该岗位在该时段已被您预约。");
+                }
             } else {
-                return ReturnBean.error("抱歉，该岗位在该时段已被您预约。");
+                return ReturnBean.error("抱歉，该岗位在该时段已被预约。");
             }
         } else {
-            return ReturnBean.error("抱歉，该岗位在该时段已被预约。");
+            return ReturnBean.error("redirect");
         }
+    }
+
+    /**
+     * 添加记录
+     * @param appointmentRecord 预约记录对象693988胡梦琪
+     * @return ReturnBean
+     */
+    @PostMapping("record/insertOut")
+    @ResponseBody
+    public ReturnBean insert(AppointmentRecord appointmentRecord) {
+        String[] names = appointmentRecord.getName().split(";");
+        for (String name : names) {
+            appointmentRecord.setName(name);
+            appointmentRecord.setInsertTime(new Date());
+            appointmentRecordService.insert(appointmentRecord);
+        }
+        return ReturnBean.ok();
     }
 
     /**
@@ -114,39 +135,39 @@ public class AppointmentRecordController {
      * @param end 结束时间（小时）
      * @return ReturnBean
      */
-    @PostMapping("record/update")
-    @ResponseBody
-    public ReturnBean update(AppointmentRecord appointmentRecord, String date, Integer begin, Integer end) {
-        Map map = new HashMap();
-        map.put("date",date);
-        map.put("begin", begin + 1);
-        map.put("end", end);
-        map.put("stationId", appointmentRecord.getStationId());
-        map.put("appoId", appointmentRecord.getId());
-        //该志愿者该时段的人数
-        Integer num = appointmentRecordService.selectRecordInfoNum(map);
-        //获取该志愿者对象
-        Station station = stationService.selectEntityById(appointmentRecord.getStationId());
-        if (num < station.getNum()) {//判断是否超过设定的人数
-            appointmentRecord.setAppointmentTime(DateUtil.stringToDate("yyyy-MM-dd", date));
-            appointmentRecord.setUpdateTime(new Date());
-            //插入预约记录主表
-            appointmentRecordService.update(appointmentRecord);
-            //删除预约记录详情表
-            recordInfoService.deleteByStationId(appointmentRecord.getId());
-            RecordInfo recordInfo = new RecordInfo();
-            recordInfo.setPhone(appointmentRecord.getPhone());
-            recordInfo.setAppoId(appointmentRecord.getId());
-            recordInfo.setStationId(appointmentRecord.getStationId());
-            recordInfo.setAppoDate(appointmentRecord.getAppointmentTime());
-            recordInfo.setInsertTime(new Date());
-            //插入预约记录详情表
-            recordInfoService.insert(recordInfo, begin, end);
-            return ReturnBean.ok();
-        }else {
-            return ReturnBean.error("抱歉，该岗位在该时段已被预约。");
-        }
-    }
+//    @PostMapping("record/update")
+//    @ResponseBody
+//    public ReturnBean update(AppointmentRecord appointmentRecord, String date, Integer begin, Integer end) {
+//        Map map = new HashMap();
+//        map.put("date",date);
+//        map.put("begin", begin + 1);
+//        map.put("end", end);
+//        map.put("stationId", appointmentRecord.getStationId());
+//        map.put("appoId", appointmentRecord.getId());
+//        //该志愿者该时段的人数
+//        Integer num = appointmentRecordService.selectRecordInfoNum(map);
+//        //获取该志愿者对象
+//        Station station = stationService.selectEntityById(appointmentRecord.getStationId());
+//        if (num < station.getNum()) {//判断是否超过设定的人数
+//            appointmentRecord.setAppointmentTime(DateUtil.stringToDate("yyyy-MM-dd", date));
+//            appointmentRecord.setUpdateTime(new Date());
+//            //插入预约记录主表
+//            appointmentRecordService.update(appointmentRecord);
+//            //删除预约记录详情表
+//            recordInfoService.deleteByStationId(appointmentRecord.getId());
+//            RecordInfo recordInfo = new RecordInfo();
+//            recordInfo.setPhone(appointmentRecord.getPhone());
+//            recordInfo.setAppoId(appointmentRecord.getId());
+//            recordInfo.setStationId(appointmentRecord.getStationId());
+//            recordInfo.setAppoDate(appointmentRecord.getAppointmentTime());
+//            recordInfo.setInsertTime(new Date());
+//            //插入预约记录详情表
+//            recordInfoService.insert(recordInfo, begin, end);
+//            return ReturnBean.ok();
+//        }else {
+//            return ReturnBean.error("抱歉，该岗位在该时段已被预约。");
+//        }
+//    }
 
     /**
      * 修改预约记录状态
@@ -156,8 +177,12 @@ public class AppointmentRecordController {
     @PostMapping("record/updateStatus")
     @ResponseBody
     public ReturnBean updateStatus(AppointmentRecord appointmentRecord) {
-        appointmentRecordService.update(appointmentRecord);
-        return ReturnBean.ok();
+        if (request.getSession().getAttribute("userPhone") != null && !"".equals(request.getSession().getAttribute("userPhone"))) {
+            appointmentRecordService.update(appointmentRecord);
+            return ReturnBean.ok();
+        } else {
+            return ReturnBean.error("redirect");
+        }
     }
 
     /**

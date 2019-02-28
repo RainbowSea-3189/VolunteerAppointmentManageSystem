@@ -82,8 +82,8 @@ public class MobileController {
         request.setAttribute("stationList", stationService.selectAll());
         //获得微信code
         String code = request.getParameter("code");
-        if (request.getSession().getAttribute("userPhone") == null) {
-            String data = WeiXInUtil.getToken();
+        if (request.getSession().getAttribute("userPhone") == null || "".equals(request.getSession().getAttribute("userPhone"))) {
+            WeiXInUtil.getToken();
             //获取用户企业微信ID
             String userId = WeiXInUtil.getUser(code).getString("UserId");
             //获取用户详细信息
@@ -153,7 +153,22 @@ public class MobileController {
     }
 
     /**
-     * 志愿者排行榜页面
+     * 外来志愿者登记页面
+     * @param stationId 志愿者ID
+     * @param stationName 志愿者名字
+     * @return String
+     */
+    @GetMapping("mobile/insertOut")
+    public String insertOut(Integer stationId, String stationName) {
+        //获取当天之后的志愿者预约信息
+        request.getSession().setAttribute("stationId", stationId);
+        request.getSession().setAttribute("stationName", stationName);
+        return "mobile/insert_out";
+    }
+
+
+    /**
+     * 志愿者排行榜页面(按月份)
      * @param month 月份
      * @return
      */
@@ -162,6 +177,17 @@ public class MobileController {
         request.setAttribute("month", month);
         //获取该月的志愿者排行榜
         request.setAttribute("list", appointmentRecordService.selectRankingList(month));
+        return "mobile/ranking_list";
+    }
+
+    /**
+     * 志愿者排行榜页面(总)
+     * @return
+     */
+    @GetMapping("mobile/getRankingListAll")
+    public String getRankingListAll() {
+        //总的的志愿者排行榜
+        request.setAttribute("list", appointmentRecordService.selectRankingListAll());
         return "mobile/ranking_list";
     }
 
@@ -193,6 +219,37 @@ public class MobileController {
     }
 
     /**
+     * 编写建议意见页面
+     */
+    @GetMapping("mobile/opinion")
+    public String opinion(Integer appoID) {
+        request.setAttribute("appoId", appoID);
+        //获得微信code
+        String code = request.getParameter("code");
+        if (code != null && "".equals(code)) {
+            WeiXInUtil.getToken();
+            //获取用户企业微信ID
+            String userId = WeiXInUtil.getUser(code).getString("UserId");
+            //获取用户详细信息
+            JSONObject userData = WeiXInUtil.getUserInfo(userId);
+            request.getSession().setAttribute("userName", userData.getString("name"));
+            request.getSession().setAttribute("userId", userId);
+            request.getSession().setAttribute("userPhone", userData.getString("mobile"));
+        }
+        return "mobile/opinion";
+    }
+
+    /**
+     * 浏览建议页面
+     */
+    @GetMapping("mobile/opinion_list")
+    public String opinionList(@RequestParam Map map) {
+        map.put("opinion", "true");
+        request.setAttribute("recordList", appointmentRecordService.selectRecord(map));
+        return "mobile/opinion_list";
+    }
+
+    /**
      * 定时任务：发送志愿者提醒
      */
     @Scheduled(cron="0 0 17 * * ? ")//每天17：00执行
@@ -200,10 +257,18 @@ public class MobileController {
         Map map = new HashMap();
         map.put("appointmentTime", DateUtil.getTheNextDate(DateUtil.getDate()));
         //获取明天的志愿者预约记录
-        List<Map> records =  appointmentRecordService.selectRecord(map);
-        for (Map record : records) {
+        List<Map> tomorrowRecords =  appointmentRecordService.selectRecord(map);
+        for (Map record : tomorrowRecords) {
             //发送企业微信消息
             WeiXInUtil.markMsg((String) record.get("WX_USER_ID"), "您好," + record.get("NAME") + ",您预约了明天的" + record.get("STATIONNAME") + "的志愿者岗位,请您安排好自己的时间，完成好志愿服务工作，谢谢!");
+        }
+        map.put("appointmentTime", DateUtil.getDate("yyyy-MM-dd"));
+        List<Map> todayRecord =  appointmentRecordService.selectRecord(map);
+        for (Map record : todayRecord) {
+            //发送企业微信消息
+            String url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxc4b817ab27010402&redirect_uri=http%3a%2f%2fwww.gyyfy.com%3a9075%2fVAMS%2fmobile%2fopinion%3fappoID%3d"+record.get("ID")+"&response_type=code&scope=snsapi_base&state=#wechat_redirect";
+//            String url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxc4b817ab27010402&redirect_uri=http%3a%2f%2fwww.gyyfy.com%3a9075%2fVAMS%2fmobile%2fopinion%3fappoID%3d70&response_type=code&scope=snsapi_base&state=#wechat_redirect";
+            WeiXInUtil.markMsg((String) record.get("WX_USER_ID"), "您好" + record.get("NAME") + ",您已完成今天的志愿者服务，感谢您的参与。您可以对我们的志愿服务工作提出建议，我们将积极听取，认真采纳。谢谢！ <a href=\"" + url + "\">点击此处</a>");
         }
     }
 

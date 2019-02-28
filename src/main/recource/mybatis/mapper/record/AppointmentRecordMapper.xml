@@ -12,15 +12,17 @@
         <result column="APPOINTMENT_TIME" jdbcType="DATE" property="appointmentTime"/>
         <result column="BEGIN_TIME" jdbcType="DATE" property="beginTime"/>
         <result column="END_TIME" jdbcType="DATE" property="endTime"/>
+        <result column="SUM_TIME" jdbcType="DOUBLE" property="sumTime"/>
         <result column="STATUS" jdbcType="VARCHAR" property="status"/>
         <result column="INSERTER" jdbcType="VARCHAR" property="inserter"/>
         <result column="INSERT_TIME" jdbcType="DATE" property="insertTime"/>
         <result column="UPDATEER" jdbcType="VARCHAR" property="updateer"/>
         <result column="UPDATE_TIME" jdbcType="DATE" property="updateTime"/>
+        <result column="OPINION" jdbcType="VARCHAR" property="opinion"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-		ID,NAME,WX_USER_ID,DEP_ID,DEP_NAME,PHONE,STATION_ID,APPOINTMENT_TIME,BEGIN_TIME,END_TIME,STATUS,INSERT_TIME,UPDATEER,UPDATE_TIME
+		ID,NAME,WX_USER_ID,DEP_ID,DEP_NAME,PHONE,STATION_ID,APPOINTMENT_TIME,BEGIN_TIME,END_TIME,SUM_TIME,STATUS,INSERT_TIME,UPDATEER,UPDATE_TIME,OPINION
 	</sql>
 
     <!-- 添加 -->
@@ -40,11 +42,13 @@
             <if test="appointmentTime != null">APPOINTMENT_TIME,</if>
             <if test="beginTime != null">BEGIN_TIME,</if>
             <if test="endTime != null">END_TIME,</if>
+            <if test="sumTime != null">SUM_TIME,</if>
             <if test="status != null">STATUS,</if>
             <if test="inserter != null">INSERTER,</if>
             <if test="insertTime != null">INSERT_TIME,</if>
             <if test="updateer != null">UPDATEER,</if>
             <if test="updateTime != null">UPDATE_TIME,</if>
+            <if test="opinion != null">OPINION,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
@@ -57,11 +61,13 @@
             <if test="appointmentTime != null">#{appointmentTime,jdbcType=DATE},</if>
             <if test="beginTime != null">#{beginTime,jdbcType=DATE},</if>
             <if test="endTime != null">#{endTime,jdbcType=DATE},</if>
+            <if test="sumTime != null">#{sumTime,jdbcType=DOUBLE},</if>
             <if test="status != null">#{status,jdbcType=VARCHAR},</if>
             <if test="inserter != null">#{inserter,jdbcType=VARCHAR},</if>
             <if test="insertTime != null">#{insertTime,jdbcType=DATE},</if>
             <if test="updateer != null">#{updateer,jdbcType=VARCHAR},</if>
             <if test="updateTime != null">#{updateTime,jdbcType=DATE},</if>
+            <if test="opinion != null">#{opinion,jdbcType=VARCHAR},</if>
         </trim>
     </insert>
 
@@ -92,11 +98,13 @@
             <if test="appointmentTime != null">APPOINTMENT_TIME = #{appointmentTime,jdbcType=DATE},</if>
             <if test="beginTime != null">BEGIN_TIME = #{beginTime,jdbcType=DATE},</if>
             <if test="endTime != null">END_TIME = #{endTime,jdbcType=DATE},</if>
+            <if test="sumTime != null">SUM_TIME = #{sumTime,jdbcType=DOUBLE},</if>
             <if test="status != null">STATUS = #{status,jdbcType=VARCHAR},</if>
             <if test="inserter != null">INSERTER = #{inserter,jdbcType=VARCHAR},</if>
             <if test="insertTime != null">INSERT_TIME = #{insertTime,jdbcType=DATE},</if>
-            <if test="updateer != null">UPDATER = #{updateer,jdbcType=VARCHAR},</if>
+            <if test="updateer != null">UPDATEER = #{updateer,jdbcType=VARCHAR},</if>
             <if test="updateTime != null">UPDATE_TIME = #{updateTime,jdbcType=DATE},</if>
+            <if test="opinion != null">OPINION = #{opinion,jdbcType=VARCHAR},</if>
         </set>
         where ID = #{id}
     </update>
@@ -104,7 +112,7 @@
     <!-- 根据ID查询 -->
     <select id="selectById" resultType="java.util.Map">
 		select
-		ID,NAME,WX_USER_ID,DEP_ID,DEP_NAME,PHONE,STATION_ID,APPOINTMENT_TIME,BEGIN_TIME,END_TIME,STATUS,INSERT_TIME,UPDATEER,UPDATE_TIME
+		ID,NAME,WX_USER_ID,DEP_ID,DEP_NAME,PHONE,STATION_ID,APPOINTMENT_TIME,BEGIN_TIME,END_TIME,SUM_TIME,STATUS,INSERT_TIME,UPDATEER,UPDATE_TIME
 		from APPOINTMENT_RECORD
 		where ID = #{id}
 	</select>
@@ -112,14 +120,14 @@
     <!-- 根据ID查询 -->
     <select id="selectEntityById" resultMap="BaseResultMap">
 		select
-		ID,NAME,WX_USER_ID,DEP_ID,DEP_NAME,PHONE,STATION_ID,APPOINTMENT_TIME,BEGIN_TIME,END_TIME,STATUS,INSERT_TIME,UPDATEER,UPDATE_TIME
+		ID,NAME,WX_USER_ID,DEP_ID,DEP_NAME,PHONE,STATION_ID,APPOINTMENT_TIME,BEGIN_TIME,END_TIME,SUM_TIME,STATUS,INSERT_TIME,UPDATEER,UPDATE_TIME
 		from APPOINTMENT_RECORD
 		where ID = #{id}
 	</select>
 
     <!-- 查询所有 -->
     <select id="selectAll" resultType="java.util.Map">
-		select ID,NAME,WX_USER_ID,DEP_ID,DEP_NAME,PHONE,STATION_ID,APPOINTMENT_TIME,BEGIN_TIME,END_TIME,STATUS,INSERT_TIME,UPDATEER,UPDATE_TIME from APPOINTMENT_RECORD
+		select ID,NAME,WX_USER_ID,DEP_ID,DEP_NAME,PHONE,STATION_ID,APPOINTMENT_TIME,BEGIN_TIME,END_TIME,SUM_TIME,STATUS,INSERT_TIME,UPDATEER,UPDATE_TIME from APPOINTMENT_RECORD
 	</select>
 
     <!-- 查询该岗位所有的预约记录 -->
@@ -145,6 +153,7 @@
 		<if test="depName != null and depName != ''"> and ar.DEP_NAME = #{depName} </if>
 		<if test="phone != null and phone != ''"> and ar.PHONE = #{phone} </if>
 		<if test="status != null and status != ''"> and ar.STATUS = #{status} </if>
+		<if test="opinion != null and opinion != ''"> and ar.OPINION is not NULL </if>
         order by ar.APPOINTMENT_TIME desc
 	</select>
 
@@ -174,11 +183,19 @@
           and APPO_DATE = to_date(#{arg1},'yyyy-MM-dd')
     </select>
 
-    <!-- 获取排行榜 -->
+    <!-- 获取排行榜分月 -->
     <select id="selectRankingList" resultType="java.util.Map" parameterType="java.lang.String">
         select ri.PHONE,ri.INSERTER,count(*) sumTime
         from (select * from RECORD_INFO where to_char(APPO_DATE, 'yyyy-MM') = #{month}) ri
         group by ri.PHONE, INSERTER
+        order by sumTime desc
+    </select>
+
+    <!-- 获取排行榜 -->
+    <select id="selectRankingListAll" resultType="java.util.Map" >
+       select NAME, PHONE, sum(SUM_TIME) sumTime
+        from APPOINTMENT_RECORD ar where ar.STATUS = 2
+        group by ar.PHONE, ar.NAME
         order by sumTime desc
     </select>
 

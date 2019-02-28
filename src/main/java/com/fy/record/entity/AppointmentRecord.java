@@ -21,11 +21,13 @@ public class AppointmentRecord implements Serializable {
     private Date appointmentTime;
     private Date beginTime;
     private Date endTime;
+    private Integer sumTime;
     private Integer status;
     private String inserter;
     private Date InsertTime;
     private String updateer;
     private Date updateTime;
+    private String opinion;
 
     public String getId() {
         return id;
@@ -107,6 +109,14 @@ public class AppointmentRecord implements Serializable {
         this.endTime = endTime;
     }
 
+    public Integer getSumTime() {
+        return sumTime;
+    }
+
+    public void setSumTime(Integer sumTime) {
+        this.sumTime = sumTime;
+    }
+
     public Integer getStatus() {
         return status;
     }
@@ -145,5 +155,13 @@ public class AppointmentRecord implements Serializable {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getOpinion() {
+        return opinion;
+    }
+
+    public void setOpinion(String opinion) {
+        this.opinion = opinion;
     }
 }

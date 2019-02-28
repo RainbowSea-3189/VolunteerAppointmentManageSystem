@@ -157,12 +157,21 @@ public class AppointmentRecordService {
     }
 
     /**
+     * 获取排行榜
+     * @return List<Map>
+     */
+    public List<Map> selectRankingListAll() {
+        return appointmentRecordMapper.selectRankingListAll();
+    }
+
+    /**
      * 按条件查询预约记录
      *
      * @param map 查询条件
      * @return Integer
      */
-    public List<Map> selectRecord(Map map) {
+    public List<Map>
+    selectRecord(Map map) {
         return appointmentRecordMapper.selectList(map);
     }
 }
